@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Doza301</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0b1320;color:white;-webkit-user-select:none;}
+.header{text-align:center;padding:15px;background:#0f1b2e;font-size:18px;font-weight:bold;}
+.logo{display:flex;justify-content:center;margin:20px 0;}
+.logo img{width:65%;max-width:240px;height:auto;}
+.container{padding:20px;}
+.panel{background:#111a2b;padding:20px;border-radius:14px;box-shadow:0 0 10px rgba(0,0,0,0.4);}
+input{width:100%;padding:15px;margin-bottom:12px;border:none;border-radius:10px;background:#1b2740;color:white;font-size:16px;box-sizing:border-box;}
+button{width:100%;padding:16px;background:#0066cc;border:none;border-radius:12px;font-size:18px;color:white;cursor:pointer;font-weight:bold;}
+.result{margin-top:15px;background:#0f1c30;padding:15px;border-radius:10px;font-size:15px;}
+
+/* Карточки уставок */
+.setpoints-grid{display:flex;gap:10px;margin-top:15px;}
+.sp-card{flex:1;background:#1b2740;padding:12px 5px;border-radius:10px;text-align:center;border:1px solid #2c3e5a;}
+.sp-label{display:block;font-size:10px;color:#7f93b5;margin-bottom:5px;text-transform:uppercase;}
+.sp-value{display:block;font-size:22px;font-weight:bold;}
+
+/* Секция ручного ввода */
+.manual-section {margin-top: 20px; border-top: 1px solid #1e2d45; padding-top: 15px; text-align: center;}
+.toggle-btn {background: none; color: #7f93b5; font-size: 13px; text-decoration: underline; cursor: pointer; border: none;}
+#manual_controls {display: none; margin-top: 15px; text-align: left;}
+
+.footer{text-align:center;margin-top:25px;font-size:12px;color:#7f93b5;line-height: 1.6;}
+</style>
+</head>
+<body>
+
+<div class="header">Doza301</div>
+
+<div class="logo"><img src="logo.png" alt="logo"></div>
+
+<div class="container">
+<div class="panel">
+
+<input id="pumped" placeholder="Прокачано, тонн" type="number" inputmode="decimal">
+<input id="plan" placeholder="План на сутки, тонн" type="number" inputmode="decimal">
+<input id="percent" placeholder="Фактическое заполнение, %" type="number" inputmode="decimal">
+
+<button onclick="calc()">РАССЧИТАТЬ</button>
+
+<div id="display_area" style="display:none;">
+    <div class="result" id="status_text"></div>
+
+    <div class="setpoints-grid">
+        <div class="sp-card">
+            <span class="sp-label">Уставка (Масса)</span>
+            <span class="sp-value" id="res_mass" style="color:#4da3ff">0</span>
+        </div>
+        <div class="sp-card">
+            <span class="sp-label">Уставка (Время)</span>
+            <span class="sp-value" id="res_time" style="color:#ffca28">0</span>
+        </div>
+    </div>
+
+    <div class="manual-section">
+        <button class="toggle-btn" onclick="toggleManual()">+/- Пересчитать время вручную</button>
+        <div id="manual_controls">
+            <label style="font-size:12px; color:#7f93b5; padding-left: 5px;">Осталось времени (ЧЧ:ММ):</label>
+            <input id="manual_time" placeholder="Пример: 02:30" type="text" style="margin-top:5px;">
+            <button onclick="recalcTime()" style="background:#2c3e5a; font-size:14px; padding:12px;">ОБНОВИТЬ УСТАВКУ ВРЕМЕНИ</button>
+        </div>
+    </div>
+</div>
+
+</div>
+<div class="footer">
+    Разработчики и тех. поддержка:<br>
+    А.Н. Колпаков | С.А. Скоробогатов
+</div>
+</div>
+
+<script>
+let globalRemainingFraction = 0; 
+
+function toggleManual() {
+    let x = document.getElementById("manual_controls");
+    x.style.display = (x.style.display === "block") ? "none" : "block";
+}
+
+function calc(){
+    let pumped = parseFloat(document.getElementById("pumped").value);
+    let plan = parseFloat(document.getElementById("plan").value);
+    let actualPercent = parseFloat(document.getElementById("percent").value);
+    
+    if(isNaN(pumped) || isNaN(plan) || isNaN(actualPercent)){
+        alert("Заполните основные поля"); return;
+    }
+
+    // 1. Авто-расчет времени до полуночи
+    let now = new Date();
+    let midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    let timeLeftHours = (midnight - now) / (1000 * 60 * 60);
+
+    // 2. Логика
+    let expectedPercent = (pumped / plan) * 100;
+    let percentDeficit = Math.max(0, expectedPercent - actualPercent);
+    let remainFlow = plan - pumped;
+    globalRemainingFraction = 1 - (actualPercent / 100);
+
+    if(remainFlow <= 0 || actualPercent >= 100){
+        document.getElementById("display_area").style.display = "block";
+        document.getElementById("status_text").innerHTML = "<b>План выполнен или лимит достигнут</b>";
+        return;
+    }
+
+    // 3. Уставки
+    let setpointMass = remainFlow / globalRemainingFraction;
+    let setpointTime = timeLeftHours / globalRemainingFraction;
+
+    // 4. Вывод
+    document.getElementById("display_area").style.display = "block";
+    document.getElementById("status_text").innerHTML = 
+        "Должно быть: <b>" + expectedPercent.toFixed(1) + " %</b><br>" +
+        "Недобор: <b>" + percentDeficit.toFixed(1) + " %</b><br>" +
+        "До 00:00 осталось: <b>" + timeLeftHours.toFixed(2) + " ч.</b>";
+
+    document.getElementById("res_mass").innerText = Math.round(setpointMass);
+    document.getElementById("res_time").innerText = setpointTime.toFixed(2);
+}
+
+function recalcTime() {
+    let timeVal = document.getElementById("manual_time").value;
+    
+    // Проверка формата ЧЧ:ММ
+    if(!timeVal.includes(":")) {
+        alert("Введите время через двоеточие, например 02:30"); return;
+    }
+
+    let parts = timeVal.split(":");
+    let hours = parseFloat(parts[0]);
+    let minutes = parseFloat(parts[1]);
+
+    if(isNaN(hours) || isNaN(minutes) || minutes >= 60) {
+        alert("Некорректный формат времени"); return;
+    }
+
+    // Перевод в десятичные часы
+    let totalHours = hours + (minutes / 60);
+    
+    if (globalRemainingFraction <= 0) {
+        alert("Сначала выполните основной расчет"); return;
+    }
+
+    let newSetpointTime = totalHours / globalRemainingFraction;
+
+    document.getElementById("res_time").innerText = newSetpointTime.toFixed(2);
+    
+    // Небольшое уведомление в тексте
+    let status = document.getElementById("status_text");
+    if(!status.innerHTML.includes("вручную")) {
+        status.innerHTML += "<br><span style='color:#ffca28; font-size:13px;'>Пересчитано вручную на " + timeVal + "</span>";
+    }
+}
+</script>
+
+</body>
+</html>
