@@ -5,28 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Doza301</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b1320;color:white;-webkit-user-select:none;}
-.header{text-align:center;padding:15px;background:#0f1b2e;font-size:18px;font-weight:bold;}
-.logo{display:flex;justify-content:center;margin:20px 0;}
-.logo img{width:65%;max-width:240px;height:auto;}
-.container{padding:20px;}
-.panel{background:#111a2b;padding:20px;border-radius:14px;box-shadow:0 0 10px rgba(0,0,0,0.4);}
-input{width:100%;padding:15px;margin-bottom:12px;border:none;border-radius:10px;background:#1b2740;color:white;font-size:16px;box-sizing:border-box;}
-button{width:100%;padding:16px;background:#0066cc;border:none;border-radius:12px;font-size:18px;color:white;cursor:pointer;font-weight:bold;}
-.result{margin-top:15px;background:#0f1c30;padding:15px;border-radius:10px;font-size:15px;}
+    body{margin:0;font-family:Arial,sans-serif;background:#0b1320;color:white;-webkit-user-select:none;}
+    
+    /* Верхняя шапка */
+    .header{text-align:center;padding:15px;background:#0f1b2e;font-size:24px;font-weight:bold;border-bottom:1px solid #1e2d45;}
+    
+    /* Логотип (сделан крупнее) */
+    .logo{display:flex;justify-content:center;margin:20px 0;}
+    .logo img{width:80%;max-width:300px;height:auto;}
+    
+    /* Подзаголовок */
+    .subtitle{text-align:center;font-size:20px;color:#cbd5e1;margin-bottom:20px;font-weight:500;}
 
-/* Карточки уставок */
-.setpoints-grid{display:flex;gap:10px;margin-top:15px;}
-.sp-card{flex:1;background:#1b2740;padding:12px 5px;border-radius:10px;text-align:center;border:1px solid #2c3e5a;}
-.sp-label{display:block;font-size:10px;color:#7f93b5;margin-bottom:5px;text-transform:uppercase;}
-.sp-value{display:block;font-size:22px;font-weight:bold;}
+    .container{padding:10px 20px 30px 20px;}
+    .panel{background:#111a2b;padding:25px;border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+    
+    /* Увеличенные подписи полей */
+    label{display:block;font-size:16px;color:#94a3b8;margin-bottom:8px;padding-left:5px;text-transform:uppercase;letter-spacing:1px;}
+    
+    /* Увеличенные поля ввода */
+    input{width:100%;padding:18px;margin-bottom:20px;border:none;border-radius:12px;background:#1b2740;color:white;font-size:24px;font-weight:bold;box-sizing:border-box;outline:none;border:1px solid #2c3e5a;}
+    input:focus{border-color:#4da3ff;background:#233150;}
+    
+    /* Крупная кнопка */
+    button.main-btn{width:100%;padding:22px;background:#0066cc;border:none;border-radius:15px;font-size:22px;color:white;cursor:pointer;font-weight:bold;margin-top:10px;box-shadow: 0 5px 0 #004a99;text-transform:uppercase;}
+    button.main-btn:active{transform:translateY(3px);box-shadow:none;}
+    
+    /* Блок результатов */
+    .result-box{margin-top:25px;background:#0f1c30;padding:20px;border-radius:12px;font-size:18px;line-height:1.8;display:none;border:1px solid #1e2d45;}
+    .check-point{color:#4da3ff; border-top: 1px solid #1e2d45; margin-top:15px; padding-top:15px;}
 
-/* Секция ручного ввода */
-.manual-section {margin-top: 20px; border-top: 1px solid #1e2d45; padding-top: 15px; text-align: center;}
-.toggle-btn {background: none; color: #7f93b5; font-size: 13px; text-decoration: underline; cursor: pointer; border: none;}
-#manual_controls {display: none; margin-top: 15px; text-align: left;}
+    /* Карточки уставок (цифры еще больше) */
+    .setpoints-grid{display:flex;gap:15px;margin-top:20px;display:none;}
+    .sp-card{flex:1;background:#1b2740;padding:20px 5px;border-radius:15px;text-align:center;border:1px solid #2c3e5a;}
+    .sp-label{display:block;font-size:12px;color:#94a3b8;margin-bottom:10px;text-transform:uppercase;font-weight:bold;}
+    .sp-value{display:block;font-size:36px;font-weight:bold;}
 
-.footer{text-align:center;margin-top:25px;font-size:12px;color:#7f93b5;line-height: 1.6;}
+    .footer{text-align:center;margin-top:40px;font-size:13px;color:#64748b;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -35,129 +50,116 @@ button{width:100%;padding:16px;background:#0066cc;border:none;border-radius:12px
 
 <div class="logo"><img src="logo.png" alt="logo"></div>
 
+<div class="subtitle">Расчет ввода уставки</div>
+
 <div class="container">
-<div class="panel">
+    <div class="panel">
+        <label>Прокачано (тонны):</label>
+        <input id="pumped" type="number" inputmode="decimal" placeholder="6000">
+        
+        <label>План на сутки (тонны):</label>
+        <input id="plan" type="number" inputmode="decimal" placeholder="8709">
+        
+        <label>Текущее время (ЧЧ:ММ):</label>
+        <input id="current_time" type="text" placeholder="08:00">
 
-<input id="pumped" placeholder="Прокачано, тонн" type="number" inputmode="decimal">
-<input id="plan" placeholder="План на сутки, тонн" type="number" inputmode="decimal">
-<input id="percent" placeholder="Фактическое заполнение, %" type="number" inputmode="decimal">
+        <label>Заполнение контейнера (%):</label>
+        <input id="percent" type="number" inputmode="decimal" placeholder="25">
 
-<button onclick="calc()">РАССЧИТАТЬ</button>
+        <button class="main-btn" onclick="calculate()">ВЫПОЛНИТЬ РАСЧЕТ</button>
 
-<div id="display_area" style="display:none;">
-    <div class="result" id="status_text"></div>
+        <div id="result_text" class="result-box"></div>
 
-    <div class="setpoints-grid">
-        <div class="sp-card">
-            <span class="sp-label">Уставка (Масса)</span>
-            <span class="sp-value" id="res_mass" style="color:#4da3ff">0</span>
-        </div>
-        <div class="sp-card">
-            <span class="sp-label">Уставка (Время)</span>
-            <span class="sp-value" id="res_time" style="color:#ffca28">0</span>
-        </div>
-    </div>
-
-    <div class="manual-section">
-        <button class="toggle-btn" onclick="toggleManual()">+/- Пересчитать время вручную</button>
-        <div id="manual_controls">
-            <label style="font-size:12px; color:#7f93b5; padding-left: 5px;">Осталось времени (ЧЧ:ММ):</label>
-            <input id="manual_time" placeholder="Пример: 02:30" type="text" style="margin-top:5px;">
-            <button onclick="recalcTime()" style="background:#2c3e5a; font-size:14px; padding:12px;">ОБНОВИТЬ УСТАВКУ ВРЕМЕНИ</button>
+        <div id="result_grid" class="setpoints-grid">
+            <div class="sp-card" id="card_mass">
+                <span class="sp-label">Уставка (МАССА)</span>
+                <span class="sp-value" id="res_mass" style="color:#4da3ff">-</span>
+            </div>
+            <div class="sp-card" id="card_time">
+                <span class="sp-label">Уставка (ВРЕМЯ)</span>
+                <span class="sp-value" id="res_time" style="color:#ffca28">-</span>
+            </div>
         </div>
     </div>
-</div>
 
-</div>
-<div class="footer">
-    Разработчики и тех. поддержка:<br>
-    А.Н. Колпаков | С.А. Скоробогатов
-</div>
+    <div class="footer">
+        Разработчики и тех. поддержка:<br>
+        А.Н. Колпаков | С.А. Скоробогатов
+    </div>
 </div>
 
 <script>
-let globalRemainingFraction = 0; 
+    function calculate() {
+        const pumpedStr = document.getElementById('pumped').value;
+        const planStr = document.getElementById('plan').value;
+        const tVal = document.getElementById('current_time').value;
+        const percStr = document.getElementById('percent').value;
 
-function toggleManual() {
-    let x = document.getElementById("manual_controls");
-    x.style.display = (x.style.display === "block") ? "none" : "block";
-}
+        if (percStr === "" || isNaN(parseFloat(percStr))) {
+            alert("Введите процент заполнения!");
+            return;
+        }
+        
+        let perc = parseFloat(percStr);
+        let emptyPerc = 100 - perc;
+        
+        if (emptyPerc <= 0) { alert("Контейнер полон!"); return; }
 
-function calc(){
-    let pumped = parseFloat(document.getElementById("pumped").value);
-    let plan = parseFloat(document.getElementById("plan").value);
-    let actualPercent = parseFloat(document.getElementById("percent").value);
-    
-    if(isNaN(pumped) || isNaN(plan) || isNaN(actualPercent)){
-        alert("Заполните основные поля"); return;
+        let timeCalculated = false;
+        let massCalculated = false;
+        let statusText = "Осталось заполнить: <b>" + emptyPerc.toFixed(1) + " %</b><br>";
+        let checkPointText = "";
+
+        // РАСЧЕТ ПО ВРЕМЕНИ (Формула: X = (Остаток часов * 100) / Остаток %)
+        if (tVal.includes(':')) {
+            let parts = tVal.split(':');
+            let h = parseFloat(parts[0]);
+            let m = parseFloat(parts[1]);
+            if (h < 24 && m < 60) {
+                let passedHours = h + m / 60;
+                let hoursLeft = 24 - passedHours;
+                
+                let setTime = (hoursLeft * 100) / emptyPerc;
+                document.getElementById('res_time').innerText = setTime.toFixed(1);
+
+                // Контрольные точки (на базе 4 кг)
+                let targetPerc = (passedHours / 24) * 100;
+                let targetKg = (4 * targetPerc) / 100;
+
+                checkPointText = "<div class='check-point'>" +
+                    "На текущее время должно быть:<br>" +
+                    "Процент: <b>" + targetPerc.toFixed(1) + " %</b><br>" +
+                    "Масса: <b>" + targetKg.toFixed(3) + " кг.</b></div>";
+
+                statusText += "До 00:00 осталось: <b>" + hoursLeft.toFixed(1) + " ч.</b>";
+                timeCalculated = true;
+            }
+        }
+
+        // РАСЧЕТ ПО МАССЕ
+        if (pumpedStr !== "" && planStr !== "") {
+            let pumped = parseFloat(pumpedStr);
+            let plan = parseFloat(planStr);
+            let setMass = (plan - pumped) / (emptyPerc / 100);
+            document.getElementById('res_mass').innerText = Math.round(setMass);
+            massCalculated = true;
+        }
+
+        if (!timeCalculated && !massCalculated) {
+            alert("Введите время или тонны!");
+            return;
+        }
+
+        document.getElementById('result_text').style.display = 'block';
+        document.getElementById('result_grid').style.display = 'flex';
+        document.getElementById('result_text').innerHTML = statusText + checkPointText;
+        
+        document.getElementById('card_mass').style.opacity = massCalculated ? "1" : "0.3";
+        document.getElementById('card_time').style.opacity = timeCalculated ? "1" : "0.3";
+        
+        // Автопрокрутка к результатам
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
-
-    // 1. Авто-расчет времени до полуночи
-    let now = new Date();
-    let midnight = new Date();
-    midnight.setHours(24, 0, 0, 0);
-    let timeLeftHours = (midnight - now) / (1000 * 60 * 60);
-
-    // 2. Логика
-    let expectedPercent = (pumped / plan) * 100;
-    let percentDeficit = Math.max(0, expectedPercent - actualPercent);
-    let remainFlow = plan - pumped;
-    globalRemainingFraction = 1 - (actualPercent / 100);
-
-    if(remainFlow <= 0 || actualPercent >= 100){
-        document.getElementById("display_area").style.display = "block";
-        document.getElementById("status_text").innerHTML = "<b>План выполнен или лимит достигнут</b>";
-        return;
-    }
-
-    // 3. Уставки
-    let setpointMass = remainFlow / globalRemainingFraction;
-    let setpointTime = timeLeftHours / globalRemainingFraction;
-
-    // 4. Вывод
-    document.getElementById("display_area").style.display = "block";
-    document.getElementById("status_text").innerHTML = 
-        "Должно быть: <b>" + expectedPercent.toFixed(1) + " %</b><br>" +
-        "Недобор: <b>" + percentDeficit.toFixed(1) + " %</b><br>" +
-        "До 00:00 осталось: <b>" + timeLeftHours.toFixed(2) + " ч.</b>";
-
-    document.getElementById("res_mass").innerText = Math.round(setpointMass);
-    document.getElementById("res_time").innerText = setpointTime.toFixed(2);
-}
-
-function recalcTime() {
-    let timeVal = document.getElementById("manual_time").value;
-    
-    // Проверка формата ЧЧ:ММ
-    if(!timeVal.includes(":")) {
-        alert("Введите время через двоеточие, например 02:30"); return;
-    }
-
-    let parts = timeVal.split(":");
-    let hours = parseFloat(parts[0]);
-    let minutes = parseFloat(parts[1]);
-
-    if(isNaN(hours) || isNaN(minutes) || minutes >= 60) {
-        alert("Некорректный формат времени"); return;
-    }
-
-    // Перевод в десятичные часы
-    let totalHours = hours + (minutes / 60);
-    
-    if (globalRemainingFraction <= 0) {
-        alert("Сначала выполните основной расчет"); return;
-    }
-
-    let newSetpointTime = totalHours / globalRemainingFraction;
-
-    document.getElementById("res_time").innerText = newSetpointTime.toFixed(2);
-    
-    // Небольшое уведомление в тексте
-    let status = document.getElementById("status_text");
-    if(!status.innerHTML.includes("вручную")) {
-        status.innerHTML += "<br><span style='color:#ffca28; font-size:13px;'>Пересчитано вручную на " + timeVal + "</span>";
-    }
-}
 </script>
 
 </body>
